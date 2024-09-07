@@ -66,7 +66,7 @@ def spending_by_category(
     ]
 
     trans_sum = sum(transactions_by_category["Сумма операции с округлением"])
-    return f"{transactions_by_category}, итого потрачено в данной категории за выбранный период: {trans_sum}"
+    return transactions_by_category
 
 
 if __name__ == "__main__":
