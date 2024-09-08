@@ -1,7 +1,5 @@
-from src.utils import reading_excel, get_user_setting, get_currency_rates, get_stock_price
+from src.utils import get_user_setting, reading_excel
 from src.views import main_window
-from src.views import get_expenses_cards, get_greeting, top_transaction, transaction_currency
-
 
 if __name__ == "__main__":
     transactions = reading_excel("..\\data\\operations.xlsx")

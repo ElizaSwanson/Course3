@@ -1,12 +1,12 @@
-import json
-
-import requests
-import logging
-import os
 import datetime
 import datetime as dt
-from dotenv import load_dotenv
+import json
+import logging
+import os
+
 import pandas as pd
+import requests
+from dotenv import load_dotenv
 
 load_dotenv("..\\.env")
 
@@ -51,7 +51,6 @@ def get_dict_transaction(file_path) -> list[dict]:
         raise
 
 
-
 def get_data(data: str) -> datetime.datetime:
     logger_utils.info(f"Получена дата: {data}")
     try:
@@ -92,7 +91,11 @@ def get_expenses_cards(transactions_list_excel) -> list[dict]:
     spent_cards = []
     for card, spent in all_cards_info.items():
         spent_cards.append(
-            {"last_digits": card, "total spent": abs(spent), "cashback": abs(round(spent / 100))}
+            {
+                "last_digits": card,
+                "total spent": abs(spent),
+                "cashback": abs(round(spent / 100)),
+            }
         )
         logger_utils.info(f"Добавлен расход по карте {card}: {spent}")
 
@@ -103,7 +106,9 @@ def get_expenses_cards(transactions_list_excel) -> list[dict]:
 def top_transaction(trans_list_excel):
     """Выводит топ-5 самых дорогих платежей по карте"""
     logger_utils.info("Начинаем вычислять топ-5 транзакций")
-    top_transaction = trans_list_excel.sort_values(by="Сумма платежа", ascending=True).iloc[:5]
+    top_transaction = trans_list_excel.sort_values(
+        by="Сумма платежа", ascending=True
+    ).iloc[:5]
     logger_utils.info("Сформирован список из 5 транзакций")
     result_top_transaction = top_transaction.to_dict(orient="records")
     top_transaction_list = []
@@ -111,7 +116,11 @@ def top_transaction(trans_list_excel):
         top_transaction_list.append(
             {
                 "date": str(
-                    (datetime.datetime.strptime(transaction["Дата операции"], "%d.%m.%Y %H:%M:%S"))
+                    (
+                        datetime.datetime.strptime(
+                            transaction["Дата операции"], "%d.%m.%Y %H:%M:%S"
+                        )
+                    )
                     .date()
                     .strftime("%d.%m.%Y")
                 ).replace("-", "."),
@@ -142,12 +151,19 @@ def get_stock_price(stocks):
         else:
             data_ = response.json()
             print(data_)
-            stock_price.append({"stock": stock, "price": round(float(data_["Global Quote"]["05. price"]), 2)})
+            stock_price.append(
+                {
+                    "stock": stock,
+                    "price": round(float(data_["Global Quote"]["05. price"]), 2),
+                }
+            )
     logger_utils.info("Функция завершила свою работу")
     return stock_price
 
+
 def get_currency_rates(currencies):
     """функция для вывода текущего курса евро и доллара"""
+
     logger_utils.info("Получаем стоимость валют...")
     api_key = os.environ.get("API_KEY_Currency")
     url = f"https://api.apilayer.com/currency_data/live?base=RUB&symbols={currencies}"
@@ -173,22 +189,33 @@ def get_currency_rates(currencies):
 
 def get_user_setting(path_to_file: str):
     """Функция перевода настроек пользователя(курс и акции) из json объекта"""
-    logger_utils.info(f"Вызываем пользовательские настройки")
+    logger_utils.info("Вызываем пользовательские настройки")
     with open(path_to_file, "r", encoding="utf-8") as f:
         user_setting = json.load(f)
         logger_utils.info("Получены настройки пользователя")
     return user_setting["user_currencies"], user_setting["user_stocks"]
 
-def transaction_currency(transactions_list_excel: pd.DataFrame, data: str) -> pd.DataFrame:
+
+def transaction_currency(
+    transactions_list_excel: pd.DataFrame, data: str
+) -> pd.DataFrame:
     """функция формирует расходы в нужном интервале"""
     fin_data = get_data(data)
     logger_utils.debug(f"Конечная дата: {fin_data}")
     start_data = fin_data.replace(day=1)
     logger_utils.debug(f"Начальная дата: {start_data}")
-    fin_data = fin_data.replace(hour=0, minute=0, second=0, microsecond=0) + dt.timedelta(days=1)
+    fin_data = fin_data.replace(
+        hour=0, minute=0, second=0, microsecond=0
+    ) + dt.timedelta(days=1)
     logger_utils.debug(f"Обновлена конечная дата: {fin_data}")
     transaction_currency = transactions_list_excel.loc[
-        (pd.to_datetime(transactions_list_excel["Дата операции"], dayfirst=True) <= fin_data)
-        & (pd.to_datetime(transactions_list_excel["Дата операции"], dayfirst=True) >= start_data)
+        (
+            pd.to_datetime(transactions_list_excel["Дата операции"], dayfirst=True)
+            <= fin_data
+        )
+        & (
+            pd.to_datetime(transactions_list_excel["Дата операции"], dayfirst=True)
+            >= start_data
+        )
     ]
     return transaction_currency

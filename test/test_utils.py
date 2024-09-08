@@ -1,11 +1,12 @@
-from src.utils import get_data, get_expenses_cards, get_currency_rates, get_greeting, get_stock_price, get_user_setting,get_dict_transaction, reading_excel
-import unittest
-from unittest import mock
-import pandas as pd
-from unittest.mock import patch, mock_open
-import pytest
 import datetime
 import datetime as dt
+from unittest.mock import patch
+
+import pandas as pd
+import pytest
+
+from src.utils import (get_data, get_dict_transaction, get_expenses_cards,
+                       get_greeting, reading_excel)
 
 
 def test_get_data_input():
@@ -54,7 +55,9 @@ def test_get_greeting_night():
 
 @pytest.fixture
 def sample_trans():
-    return pd.DataFrame({"Номер карты": ["*4444", "*5058"], "Сумма платежа": [-500, -1313]})
+    return pd.DataFrame(
+        {"Номер карты": ["*4444", "*5058"], "Сумма платежа": [-500, -1313]}
+    )
 
 
 def test_get_expenses_cards(sample_trans):
