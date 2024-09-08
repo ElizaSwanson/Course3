@@ -1,17 +1,14 @@
-import pytest
 import pandas as pd
+import pytest
+
 from src.reports import spending_by_category
-from src.utils import get_data
 
 
 @pytest.fixture
 def test_categs():
     """Тестовые данные для функции трат по категориям"""
     data = {
-        "Дата операции": [
-            "11.11.2019 01:01:01",
-            "25.04.2020 19:04:59"
-        ],
+        "Дата операции": ["11.11.2019 01:01:01", "25.04.2020 19:04:59"],
         "Категория": ["Каршеринг", "Каршеринг"],
         "Сумма операции с округлением": [400, 4192],
     }

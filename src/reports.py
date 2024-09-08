@@ -65,7 +65,6 @@ def spending_by_category(
         & (df_transactions["Категория"] == category)
     ]
 
-    trans_sum = sum(transactions_by_category["Сумма операции с округлением"])
     return transactions_by_category
 
 

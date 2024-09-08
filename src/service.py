@@ -15,19 +15,19 @@ logger_utils.setLevel(logging.DEBUG)
 def get_transactions_excel(excel_path: list[dict]) -> list[dict]:
     """принимает на вход путь до файла Excel и возвращает список транзакций"""
     transaction_list = []
-    trans_pattern = r"\b[А-Я][а-я]+\s[А-Я]\."
+    trans_pattern = r"\D+\s\D\."
     logger_utils.info("Считываю информацию...")
     for e_data in excel_path:
         if "Описание" in e_data and re.match(trans_pattern, e_data["Описание"]):
             transaction_list.append(e_data)
     if transaction_list:
         logger_utils.info("Файлы найдены и отфильтрованы!")
-        list_to_json = json.dumps(transaction_list, ensure_ascii=False)
+        list_to_json = json.dumps(transaction_list, ensure_ascii=False, indent=4)
         logger_utils.info("Вот список:")
         return list_to_json
     else:
         logger_utils.critical("Файл не найден")
-        return None
+        return "[]"
 
 
 if __name__ == "__main__":
