@@ -5,6 +5,7 @@ import logging
 import os
 
 import pandas as pd
+import pytest
 import requests
 from dotenv import load_dotenv
 
@@ -137,26 +138,21 @@ def top_transaction(trans_list_excel):
         return None
 
 
-def get_stock_price(stocks):
+def get_stock_price(stocks: list) -> list:
     """Функция для вывода стоимости акций"""
     logger_utils.info("Ищем курсы акций...")
-    api_key = os.environ.get("API_KEY_Stocks")
+    api_key = os.getenv("API_KEY_Stocks")
     stock_price = []
     for stock in stocks:
-        url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={stock}&interval=5min&apikey={api_key}'"
-        response = requests.get(url)
-        if response.status_code != 200:
-            print(f"Запрос не был успешным. Возможная причина: {response.reason}")
-
-        else:
-            data_ = response.json()
-            print(data_)
-            stock_price.append(
-                {
-                    "stock": stock,
-                    "price": round(float(data_["Global Quote"]["05. price"]), 2),
-                }
-            )
+        url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={stock}&apikey={api_key}"
+        response = requests.get(url, timeout=5, allow_redirects=False)
+        data_ = response.json()
+        stock_price.append(
+            {
+                "stock": stock,
+                "price": round(float(data_["Global Quote"]["05. price"]), 2)
+            }
+        )
     logger_utils.info("Функция завершила свою работу")
     return stock_price
 
@@ -169,22 +165,17 @@ def get_currency_rates(currencies):
     url = f"https://api.apilayer.com/currency_data/live?base=RUB&symbols={currencies}"
     headers = {"apikey": api_key}
     response = requests.get(url, headers=headers)
-    status_code = response.status_code
-    if status_code != 200:
-        print(f"Ошибка. Возможная причина: {response.reason}")
-
-    else:
-        data = response.json()
-        quotes = data.get("quotes", {})
-        usd = quotes.get("USDRUB")
-        eur_usd = quotes.get("USDEUR")
-        eur = usd / eur_usd
-        logger_utils.info("Успешно!")
-
-        return [
+    data = response.json()
+    quotes = data.get("quotes")
+    usd = quotes.get("USDRUB")
+    eur_usd = quotes.get("USDEUR")
+    eur = usd / eur_usd
+    logger_utils.info("Успешно!")
+    rates = [
             {"currency": "USD", "rate": round(usd, 2)},
             {"currency": "EUR", "rate": round(eur, 2)},
         ]
+    return rates
 
 
 def get_user_setting(path_to_file: str):
