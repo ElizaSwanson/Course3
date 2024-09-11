@@ -1,13 +1,16 @@
 import datetime
 import datetime as dt
-from unittest.mock import patch, Mock
-from dotenv import load_dotenv
-load_dotenv()
+from unittest.mock import Mock, patch
+
 import pandas as pd
 import pytest
+from dotenv import load_dotenv
 
-from src.utils import (get_data, get_dict_transaction, get_expenses_cards,
-                       get_greeting, reading_excel, get_stock_price, get_currency_rates)
+from src.utils import (get_currency_rates, get_data, get_dict_transaction,
+                       get_expenses_cards, get_greeting, get_stock_price,
+                       reading_excel)
+
+load_dotenv()
 
 
 def test_get_data_input():
@@ -75,10 +78,12 @@ def test_stock(mock_get):
     assert res == [{"stock": "AAPL", "price": 220.82}]
 
 
-@patch('requests.get')
+@patch("requests.get")
 def test_currency_rates(mock_get):
     mock_response = Mock()
-    mock_response.json.return_value = {"quotes": {"USDEUR": 0.90486, "USDRUB": 90.719294}}
+    mock_response.json.return_value = {
+        "quotes": {"USDEUR": 0.90486, "USDRUB": 90.719294}
+    }
     mock_get.side_effect = [mock_response]
     result = get_currency_rates("USD,EUR")
     expected = [{"currency": "USD", "rate": 90.72}, {"currency": "EUR", "rate": 100.26}]

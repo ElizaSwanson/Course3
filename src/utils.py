@@ -5,7 +5,6 @@ import logging
 import os
 
 import pandas as pd
-import pytest
 import requests
 from dotenv import load_dotenv
 
@@ -150,7 +149,7 @@ def get_stock_price(stocks: list) -> list:
         stock_price.append(
             {
                 "stock": stock,
-                "price": round(float(data_["Global Quote"]["05. price"]), 2)
+                "price": round(float(data_["Global Quote"]["05. price"]), 2),
             }
         )
     logger_utils.info("Функция завершила свою работу")
@@ -172,9 +171,9 @@ def get_currency_rates(currencies):
     eur = usd / eur_usd
     logger_utils.info("Успешно!")
     rates = [
-            {"currency": "USD", "rate": round(usd, 2)},
-            {"currency": "EUR", "rate": round(eur, 2)},
-        ]
+        {"currency": "USD", "rate": round(usd, 2)},
+        {"currency": "EUR", "rate": round(eur, 2)},
+    ]
     return rates
 
 
